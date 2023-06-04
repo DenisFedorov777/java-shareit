@@ -38,13 +38,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateById(ItemDto itemDto, Long id, Long userId) {
-        Item newItem = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Такой вещи нет!"));
-        if (StringUtils.hasLength(itemDto.getName())) {
-            newItem.setName(itemDto.getName());
-        }
+    public ItemDto updateById(ItemDto itemDto, Long itemId, Long userId) {
+        Item newItem = repository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("Такой вещи нет!"));
         if (!Objects.equals(newItem.getOwner().getId(), userId)) {
             throw new NotFoundException("Это не тот владелец, ищите другого");
+        }
+        if (StringUtils.hasLength(itemDto.getName())) {
+            newItem.setName(itemDto.getName());
         }
         if (StringUtils.hasLength(itemDto.getDescription())) {
             newItem.setDescription(itemDto.getDescription());
@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             newItem.setAvailable(itemDto.getAvailable());
         }
-        repository.updateById(newItem, id);
+        repository.updateById(newItem, itemId);
         return ItemMapper.toItemDto(newItem);
     }
 

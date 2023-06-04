@@ -1,11 +1,13 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ExistEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,8 +27,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserById(Long Id) {
-        return repository.findById(Id)
+    public User findUserById(Long id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Залетный юзер"));
     }
 

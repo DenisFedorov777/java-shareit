@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
@@ -28,13 +28,25 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void delete(final Long id) {
+    public void deleteById(final Long id) {
         dataUsers.remove(id);
     }
 
     @Override
-    public User update(final User user) {
-        dataUsers.put(user.getId(), user);
+    public User update(final User user, Long id) {
+        dataUsers.put(id, user);
         return user;
+    }
+
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(dataUsers.get(id));
+    }
+
+    public boolean isExistEmail(String email) {
+        long result = dataUsers.values()
+                .stream()
+                .filter(user -> user.getEmail().equalsIgnoreCase(email))
+                .count();
+        return result > 0;
     }
 }

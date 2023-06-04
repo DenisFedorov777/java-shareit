@@ -1,9 +1,7 @@
 package ru.practicum.shareit.request;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 /**
  * TODO Sprint add-item-requests.

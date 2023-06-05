@@ -10,9 +10,6 @@ import ru.practicum.shareit.user.model.User;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-controllers.
- */
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
@@ -20,17 +17,12 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
 
     Long id;
-
     @NotBlank(message = "Заполните название")
     String name;
-
     @NotBlank(message = "Заполните описание")
     String description;
-
     @NotNull(message = "Не установлен статус")
     Boolean available;
-
     User owner;
-
     Long request;
 }

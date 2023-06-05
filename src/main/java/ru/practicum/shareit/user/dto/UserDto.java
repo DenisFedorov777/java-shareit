@@ -18,10 +18,8 @@ public class UserDto {
 
     @Positive
     Long id;
-
     @NotBlank(message = "Ошибка - укажите имя")
     String name;
-
     @Email(message = "Ошибка - некорректный формат электронной почты")
     @NotBlank(message = "Ошибка - укажите электронную почту")
     String email;

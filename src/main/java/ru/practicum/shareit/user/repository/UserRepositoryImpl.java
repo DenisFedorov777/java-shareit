@@ -7,8 +7,8 @@ import java.util.*;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-    private static final Map<Long, User> dataUsers = new HashMap<>();
 
+    private static final Map<Long, User> dataUsers = new HashMap<>();
     private volatile Long nextId = 1L;
 
     private synchronized Long generatedId() {

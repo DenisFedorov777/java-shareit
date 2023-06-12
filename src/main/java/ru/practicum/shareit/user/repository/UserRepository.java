@@ -15,7 +15,7 @@ public interface UserRepository {
 
     User update(User user, Long id);
 
-    boolean isExistEmail(String email);
+    boolean isExistEmail(User user);
 
     Optional<User> findById(Long id);
 }

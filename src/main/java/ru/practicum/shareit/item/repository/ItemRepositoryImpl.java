@@ -3,10 +3,7 @@ package ru.practicum.shareit.item.repository;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -14,6 +11,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     private volatile Long id = 1L;
     private final Map<Long, Item> dataItems = new HashMap<>();
+    private final Map<Long, List<Item>> itemsByUser = new HashMap<>();
 
     private synchronized Long generatedId() {
         return id++;
@@ -23,6 +21,11 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Item addItem(Item item) {
         item.setId(generatedId());
         dataItems.put(item.getId(), item);
+        Long userId = item.getOwner().getId();
+        if (!itemsByUser.containsKey(userId)) {
+            itemsByUser.put(userId, new ArrayList<>());
+        }
+        itemsByUser.get(userId).add(item);
         return item;
     }
 
@@ -34,14 +37,14 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public void updateById(Item item, Long id) {
         dataItems.put(id, item);
+        Long userId = item.getOwner().getId();
+        itemsByUser.get(userId).remove(item);
+        itemsByUser.get(userId).add(item);
     }
 
     @Override
     public List<Item> findByUserId(Long userId) {
-        return dataItems.values()
-                .stream()
-                .filter(item -> item.getOwner().getId().equals(userId))
-                .collect(Collectors.toList());
+        return itemsByUser.get(userId);
     }
 
     @Override

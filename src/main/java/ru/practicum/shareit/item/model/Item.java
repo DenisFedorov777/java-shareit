@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Builder
@@ -18,4 +20,17 @@ public class Item {
     String description;
     Boolean available;
     User owner;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return Objects.equals(id, item.id) && Objects.equals(owner, item.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, owner);
+    }
 }

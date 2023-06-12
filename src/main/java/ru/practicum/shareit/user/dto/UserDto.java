@@ -16,7 +16,6 @@ import javax.validation.constraints.Positive;
 @Builder
 public class UserDto {
 
-    @Positive
     Long id;
     @NotBlank(message = "Ошибка - укажите имя")
     String name;

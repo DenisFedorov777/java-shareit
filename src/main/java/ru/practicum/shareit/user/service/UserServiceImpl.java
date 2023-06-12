@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Залетный юзер"));
+                .orElseThrow(() -> new NotFoundException("Залетный юзер"));
     }
 
     public UserDto getUserById(Long id) {

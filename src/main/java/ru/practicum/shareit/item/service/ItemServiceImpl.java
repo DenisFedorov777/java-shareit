@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepositoryImpl;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.Collections;
@@ -20,26 +21,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository repository;
-    private final UserServiceImpl service;
+    private final ItemRepository itemRepository;
+    private final UserRepositoryImpl userRepository;
 
     @Override
     public ItemDto getItemById(Long id) {
-        Item item = repository.findById(id).orElseThrow(() -> new NotFoundException("Такой вещи нет"));
+        Item item = itemRepository.findById(id).orElseThrow(() -> new NotFoundException("Такой вещи нет"));
         return ItemMapper.toItemDto(item);
     }
 
     @Override
     public ItemDto create(ItemDto itemDto, Long userId) {
-        User user = service.findUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден."));
         Item newItem = ItemMapper.toItem(itemDto);
         newItem.setOwner(user);
-        return ItemMapper.toItemDto(repository.addItem(newItem));
+        return ItemMapper.toItemDto(itemRepository.addItem(newItem));
     }
 
     @Override
     public ItemDto updateById(ItemDto itemDto, Long itemId, Long userId) {
-        Item newItem = repository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("Такой вещи нет!"));
+        Item newItem = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("Такой вещи нет!"));
         if (!Objects.equals(newItem.getOwner().getId(), userId)) {
             throw new NotFoundException("Это не тот владелец, ищите другого");
         }
@@ -52,13 +53,13 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             newItem.setAvailable(itemDto.getAvailable());
         }
-        repository.updateById(newItem, itemId);
+        itemRepository.updateById(newItem, itemId);
         return ItemMapper.toItemDto(newItem);
     }
 
     @Override
     public List<ItemDto> getAllItemByUserId(Long userId) {
-        List<Item> items = repository.findByUserId(userId);
+        List<Item> items = itemRepository.findByUserId(userId);
         return items.stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -69,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
         if (!StringUtils.hasLength(text)) {
             return Collections.emptyList();
         }
-        return repository.findBySearch(text).stream()
+        return itemRepository.findBySearch(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }

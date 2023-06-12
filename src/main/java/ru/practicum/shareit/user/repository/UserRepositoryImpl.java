@@ -25,7 +25,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User create(User user) {
         user.setId(generatedId());
         dataUsers.put(user.getId(), user);
-        dataEmails.add(user.getEmail());
+        dataEmails.add(user.getEmail().toLowerCase());
         return user;
     }
 
@@ -37,10 +37,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User update(final User user, Long userId) {
-        if(dataEmails.contains(dataUsers.get(userId).getEmail())) {
+        if (dataEmails.contains(dataUsers.get(userId).getEmail())) {
             dataEmails.remove(user.getEmail());
         }
-        dataEmails.add(user.getEmail());
+        dataEmails.add(user.getEmail().toLowerCase());
         dataUsers.put(userId, user);
         return user;
     }
@@ -50,11 +50,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public boolean isExistEmail(String email) {
-        //return dataEmails.contains(email);
-        long result = dataUsers.values()
+        return dataEmails.contains(email);
+        /*long result = dataUsers.values()
                 .stream()
                 .filter(user -> user.getEmail().equalsIgnoreCase(email))
                 .count();
-        return result > 0;
+        return result > 0;*/
     }
 }

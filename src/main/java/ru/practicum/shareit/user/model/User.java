@@ -5,10 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.model.Item;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter

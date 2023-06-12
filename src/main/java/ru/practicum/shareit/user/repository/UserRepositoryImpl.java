@@ -50,11 +50,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public boolean isExistEmail(String email) {
-        return dataEmails.contains(email);
-        /*long result = dataUsers.values()
+        long result = dataUsers.values()
                 .stream()
                 .filter(user -> user.getEmail().equalsIgnoreCase(email))
                 .count();
-        return result > 0;*/
+        return result > 0;
     }
 }

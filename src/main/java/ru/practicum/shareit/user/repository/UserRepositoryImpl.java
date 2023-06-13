@@ -7,7 +7,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
-
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -65,7 +64,7 @@ public class UserRepositoryImpl implements UserRepository {
         return Optional.ofNullable(dataUsers.get(id));
     }
 
-    public boolean isExistEmail(User user) {
+    private boolean isExistEmail(User user) {
         return (dataEmails.containsKey(user.getEmail()) && (!dataEmails.get(user.getEmail()).equals(user.getId())));
     }
 }

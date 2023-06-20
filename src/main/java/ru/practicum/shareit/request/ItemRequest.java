@@ -1,16 +1,29 @@
 package ru.practicum.shareit.request;
 
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.CreatedDate;
 import ru.practicum.shareit.user.model.User;
 
-/**
- * TODO Sprint add-item-requests.
- */
-@Data
-public class ItemRequest {
+import javax.persistence.*;
+import java.time.Instant;
 
-    private int id;
-    private String description;
-    private User requestor;
-    private User created;
+@Entity
+@Table(name = "requests")
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ItemRequest {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    @Column(nullable = false)
+    String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requestor_id", nullable = false)
+    User requestor;
+    @CreatedDate
+    final Instant created = Instant.now();
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -6,19 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDto {
-    Long id;
-    @NotBlank
-    String name;
+public class ItemRequestDto {
     @NotNull
-    @Email
-    String email;
+    String description;
+    final LocalDateTime createdDate;
 }

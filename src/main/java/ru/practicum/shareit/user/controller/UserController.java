@@ -1,48 +1,53 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserPatchDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.mapper.UserPatchMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Slf4j
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService service;
+    private final UserMapper userMapper;
+    private final UserPatchMapper patchMapper;
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        log.info("Получение списка пользователей");
-        return service.getAll();
-    }
-
-    @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) {
-        log.info("Получение данных пользователя");
-        return service.getUserById(userId);
+    public List<UserDto> getUsers() {
+        return service.getUsers()
+                .stream()
+                .map(userMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
-        log.info("Добавление пользователя");
-        return service.create(userDto);
+        User user = userMapper.toUser(userDto);
+        return userMapper.toUserDto(service.createUser(user));
     }
 
-    @PatchMapping("/{userId}")
-    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
-        log.info("Изменение данных пользователя");
-        return service.updateUser(userDto, userId);
+    @PatchMapping("/{id}")
+    public UserDto updateUser(@Valid @RequestBody UserPatchDto userPatchDto, @PathVariable("id") Long userId) {
+        User user = patchMapper.toUser(userPatchDto, userId);
+        return userMapper.toUserDto(service.updateUser(user, userId));
     }
 
-    @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable("userId") Long id) {
-        log.info("Удаление пользователя");
-        service.deleteUserById(id);
+    @GetMapping("/{id}")
+    public UserDto findUserById(@PathVariable("id") Long userId) {
+        return userMapper.toUserDto(service.findUserById(userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUserById(@PathVariable("id") Long userId) {
+        service.deleteUserById(userId);
     }
 }

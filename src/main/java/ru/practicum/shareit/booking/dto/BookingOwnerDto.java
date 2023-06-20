@@ -6,20 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BookingDto {
-    Long itemId;
-    @FutureOrPresent
-    @NotNull
+public class BookingOwnerDto {
+    Long id;
     LocalDateTime start;
-    @FutureOrPresent
-    @NotNull
     LocalDateTime end;
+    Long bookerId;
 }

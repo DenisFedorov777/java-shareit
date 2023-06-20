@@ -1,34 +1,33 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bookings")
-@Data
+@Table(name = "comments")
+@Getter
+@Setter
+@EqualsAndHashCode
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Booking {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @Column(name = "start_date")
-    LocalDateTime startDate;
-    @Column(name = "end_date")
-    LocalDateTime endDate;
+    @Column(name = "TEXT")
+    String text;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     Item item;
-    @ManyToOne
-    @JoinColumn(name = "booker_id")
-    User booker;
-    @Enumerated(EnumType.STRING)
-    BookingStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    User user;
+    @Column(name = "created_date")
+    final LocalDateTime createdDate = LocalDateTime.now();
 }

@@ -1,10 +1,12 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingDtoResponse;
-import ru.practicum.shareit.booking.dto.BookingOwnerDto;
+import ru.practicum.shareit.booking.model.dto.BookingDto;
+import ru.practicum.shareit.booking.model.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.model.dto.BookingOwnerDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.statuses.BookingStatus;
 import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;

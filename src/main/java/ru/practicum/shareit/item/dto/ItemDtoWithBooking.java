@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.booking.dto.BookingOwnerDto;
+import ru.practicum.shareit.booking.model.dto.BookingOwnerDto;
 
 import java.util.List;
 

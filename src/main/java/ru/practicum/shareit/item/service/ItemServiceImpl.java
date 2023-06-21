@@ -95,7 +95,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment createComment(Long userId, Comment comment, Long itemId) {
-        LocalDateTime createdDate = comment.getCreatedDate();
+        LocalDateTime createdDate = comment.getCreated();
         if (isCheckItemExistsByRenter(itemId, userId, createdDate)) {
             comment.setUser(userRepository.findById(userId)
                     .orElseThrow(() -> new UserNotFoundException("Пользователь с таким идентификатором не найден.")));

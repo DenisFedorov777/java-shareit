@@ -28,6 +28,6 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     User user;
-    @Column(name = "created_date")
-    final LocalDateTime createdDate = LocalDateTime.now();
+    @Column(name = "created")
+    final LocalDateTime created = LocalDateTime.now();
 }

@@ -21,5 +21,5 @@ public class CommentDtoRequest {
     String text;
     Item item;
     User user;
-    final LocalDateTime createdDate = LocalDateTime.now();
+    final LocalDateTime created = LocalDateTime.now();
 }

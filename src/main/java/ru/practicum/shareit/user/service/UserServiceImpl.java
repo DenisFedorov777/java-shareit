@@ -33,8 +33,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User updateUser(User user, Long userId) {
-        User updateUser = findUserById(userId);
-
+        User updateUser = repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким идентификатором не найден."));
         Optional.ofNullable(user.getName()).ifPresent(updateUser::setName);
         Optional.ofNullable(user.getEmail()).ifPresent(updateUser::setEmail);
 
@@ -50,7 +50,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUserById(Long userId) {
-        findUserById(userId);
+        repository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким идентификатором не найден."));
         repository.deleteById(userId);
     }
 }

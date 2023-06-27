@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.mapper;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -10,11 +11,11 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class ItemMapper {
 
-    public ItemDto toItemDto(Item item) {
+    public static ItemDto toItemDto(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -25,7 +26,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public Item toItem(ItemDto itemDto, User owner) {
+    public static Item toItem(ItemDto itemDto, User owner) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
@@ -36,7 +37,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemDtoWithBooking toItemDtoBooking(Item item, List<CommentDto> comments) {
+    public static ItemDtoWithBooking toItemDtoBooking(Item item, List<CommentDto> comments) {
         return ItemDtoWithBooking.builder()
                 .id(item.getId())
                 .name(item.getName())

@@ -3,7 +3,10 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.dto.BookingDto;
+import ru.practicum.shareit.booking.model.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.statuses.BookingState;
 import ru.practicum.shareit.booking.statuses.BookingStatus;
@@ -11,6 +14,8 @@ import ru.practicum.shareit.exception.BookingNotFoundException;
 import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -24,15 +29,22 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
-    private final BookingRepository repository;
+    private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
+    @Transactional
     @Override
-    public Booking createBookingRequest(Booking booking, Long userId) {
-        Item item = itemRepository.findById(booking.getItem().getId())
+    public BookingDtoResponse createBookingRequest(BookingDto bookingDto, Long userId) {
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd()) || bookingDto.getStart().equals(bookingDto.getEnd())) {
+            throw new InvalidDataException("Дата начала бронирования должна быть раньше даты окончания.");
+        }
+        User booker = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с таким идентификатором не найден."));
+        Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ItemNotFoundException("Товар с таким идентификатором не найден"));
         User userOwner = item.getOwner();
         if (Boolean.FALSE.equals(item.getAvailable())) {
@@ -40,17 +52,20 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidDataException("Товар недоступен для бронирования");
         }
         if (!userOwner.getId().equals(userId)) {
-            return repository.save(booking);
+            Booking booking = BookingMapper.toBooking(bookingDto, item, booker);
+            return BookingMapper.toBookingDtoResponse(bookingRepository.save(booking), ItemMapper.toItemDto(item));
         } else {
             log.error("Владелец не может создать запрос на создание собственной вещи");
             throw new UserNotFoundException("Владелец не может создать запрос на создание собственной вещи");
         }
     }
 
+    @Transactional
     @Override
-    public Booking updateBookingStatusByOwner(Long bookingId, Long userId, boolean approved) {
-        Booking booking = repository.findById(bookingId)
+    public BookingDtoResponse updateBookingStatusByOwner(Long bookingId, Long userId, boolean approved) {
+        Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Такого бронирования нет."));
+        ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
         User userOwner = booking.getItem().getOwner();
         if (booking.getStatus().equals(BookingStatus.APPROVED) && approved) {
             log.info("Status already: approved");
@@ -66,7 +81,8 @@ public class BookingServiceImpl implements BookingService {
             } else {
                 booking.setStatus(BookingStatus.REJECTED);
             }
-            return repository.save(booking);
+
+            return BookingMapper.toUpdateBookingDtoResponse(bookingRepository.save(booking), itemDto);
         } else {
             log.error("Только владелец может подтвердить бронирование предмета.");
             throw new UserNotFoundException("Только владелец может подтвердить бронирование предмета.");
@@ -74,15 +90,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking getBookingDetails(Long bookingId, Long userId) {
+    public BookingDtoResponse getBookingDetails(Long bookingId, Long userId) {
         validateExistsUser(userId);
-        Booking booking = repository.findById(bookingId)
+        Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Бронирование не найдено."));
+        Item item = itemRepository.findById(booking.getItem().getId())
+                .orElseThrow(() -> new ItemNotFoundException("Товар с таким идентификатором не найден"));
+        ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
         User userOwner = booking.getItem().getOwner();
         User userAuthor = booking.getBooker();
         if (userId.equals(userAuthor.getId()) || userId.equals(userOwner.getId())) {
-            return repository.findById(bookingId)
-                    .orElseThrow(() -> new BookingNotFoundException("Бронирование не найдено."));
+            return BookingMapper.toBookingDtoResponse(booking, itemDto);
         } else {
             log.error("Только автор или владелец может проверить детали бронирования.");
             throw new UserNotFoundException("Только автор или владелец может проверить детали бронирования.");
@@ -90,20 +108,32 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBookingsByAuthor(BookingState state, Long userId) {
+    public List<BookingDtoResponse> getAllBookingsByAuthor(BookingState state, Long userId) {
         validateExistsUser(userId);
-        return getAllBookingsWithStateParameter(state, repository.findAllByBooker_IdOrderByStartDateDesc(userId));
+        return getAllBookingsWithStateParameter(state, bookingRepository.findAllByBooker_IdOrderByStartDateDesc(userId))
+                .stream()
+                .map(booking -> {
+                    ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
+                    return BookingMapper.toBookingDtoResponse(booking, itemDto);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Booking> getAllBookingByOwner(BookingState state, Long userId) {
+    public List<BookingDtoResponse> getAllBookingByOwner(BookingState state, Long userId) {
         validateExistsUser(userId);
-        List<Booking> listBookingsByOwner = repository.findAllByItem_Owner_IdOrderByStartDateDesc(userId);
+        List<Booking> listBookingsByOwner = bookingRepository.findAllByItem_Owner_IdOrderByStartDateDesc(userId);
         if (listBookingsByOwner.isEmpty()) {
             log.error("У этого пользователя нет добавленного товара.");
             throw new ItemNotFoundException("У этого пользователя нет добавленного товара.");
         }
-        return getAllBookingsWithStateParameter(state, listBookingsByOwner);
+        return getAllBookingsWithStateParameter(state, listBookingsByOwner)
+                .stream()
+                .map(booking -> {
+                    ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
+                    return BookingMapper.toBookingDtoResponse(booking, itemDto);
+                })
+                .collect(Collectors.toList());
     }
 
     private List<Booking> getAllBookingsWithStateParameter(BookingState state, List<Booking> listBookingsByUser) {

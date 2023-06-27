@@ -1,62 +1,49 @@
 package ru.practicum.shareit.booking.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
 import ru.practicum.shareit.booking.model.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.model.dto.BookingOwnerDto;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.statuses.BookingStatus;
-import ru.practicum.shareit.exception.InvalidDataException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.model.User;
 
-@Component
-@RequiredArgsConstructor
+@UtilityClass
 public class BookingMapper {
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
-    private final ItemMapper itemMapper;
-    private final UserMapper userMapper;
 
-    public Booking toBooking(BookingDto bookingDto, Long userId) {
-        if (!isStartBeforeEnd(bookingDto)) {
-            throw new InvalidDataException("Дата начала бронирования должна быть раньше даты окончания.");
-        }
+    public Booking toBooking(BookingDto bookingDto, Item item, User booker) {
+
         return Booking.builder()
                 .startDate(bookingDto.getStart())
                 .endDate(bookingDto.getEnd())
-                .item(itemRepository.findById(bookingDto.getItemId())
-                        .orElseThrow(() -> new ItemNotFoundException("Item not found for create booking")))
-                .booker(userRepository.findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException("User not found for create booking")))
+                .item(item)
+                .booker(booker)
                 .status(BookingStatus.WAITING)
                 .build();
     }
 
-    public BookingDtoResponse toBookingDtoResponse(Booking booking) {
+    public BookingDtoResponse toBookingDtoResponse(Booking booking, ItemDto itemDto) {
         return BookingDtoResponse.builder()
                 .id(booking.getId())
-                .item(itemMapper.toItemDto(booking.getItem()))
+                .item(itemDto)
                 .start(booking.getStartDate())
                 .end(booking.getEndDate())
                 .status(booking.getStatus())
-                .booker(userMapper.toBookerDto(booking.getBooker()))
+                .booker(UserMapper.toBookerDto(booking.getBooker()))
                 .build();
     }
 
-    public BookingDtoResponse toUpdateBookingDtoResponse(Booking booking) {
+    public BookingDtoResponse toUpdateBookingDtoResponse(Booking booking, ItemDto itemDto) {
         return BookingDtoResponse.builder()
                 .id(booking.getId())
-                .item(itemMapper.toItemDto(booking.getItem()))
+                .item(itemDto)
                 .start(booking.getStartDate())
                 .end(booking.getEndDate())
                 .status(booking.getStatus())
-                .booker(userMapper.toBookerDto(booking.getBooker()))
+                .booker(UserMapper.toBookerDto(booking.getBooker()))
                 .build();
     }
 
@@ -67,9 +54,5 @@ public class BookingMapper {
                 .end(booking.getEndDate())
                 .bookerId(booking.getBooker().getId())
                 .build();
-    }
-
-    private boolean isStartBeforeEnd(BookingDto bookingDto) {
-        return bookingDto.getStart().isBefore(bookingDto.getEnd());
     }
 }

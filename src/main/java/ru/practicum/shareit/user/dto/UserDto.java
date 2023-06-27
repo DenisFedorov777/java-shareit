@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.controller.Create;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -16,9 +16,9 @@ import javax.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
     Long id;
-    @NotBlank
+    @NotBlank(groups = Create.class)
     String name;
-    @NotNull
-    @Email
+    @NotBlank(groups = Create.class)
+    @Email(groups = Create.class)
     String email;
 }

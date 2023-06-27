@@ -1,21 +1,18 @@
 package ru.practicum.shareit.item.mapper;
 
-import lombok.RequiredArgsConstructor;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
+@UtilityClass
 @Slf4j
 public class ItemMapper {
-    private final UserService service;
 
     public ItemDto toItemDto(Item item) {
         return ItemDto.builder()
@@ -28,13 +25,13 @@ public class ItemMapper {
                 .build();
     }
 
-    public Item toItem(ItemDto itemDto) {
+    public Item toItem(ItemDto itemDto, User owner) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
-                .owner(itemDto.getOwner() != null ? service.findUserById(itemDto.getOwner()) : null)
+                .owner(owner)
                 .itemRequest(itemDto.getItemRequest() != null ? itemDto.getItemRequest() : null)
                 .build();
     }

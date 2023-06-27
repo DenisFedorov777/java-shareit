@@ -3,8 +3,7 @@ DROP TABLE IF EXISTS users, requests, items, bookings, comments;
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(512) NOT NULL,
-    CONSTRAINT uq_user_email UNIQUE (email)
+    email VARCHAR(512) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS requests (

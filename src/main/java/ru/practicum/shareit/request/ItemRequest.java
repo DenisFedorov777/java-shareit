@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "requests")
@@ -24,6 +25,6 @@ public class ItemRequest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requestor_id", nullable = false)
     User requestor;
-    @CreatedDate
-    final Instant created = Instant.now();
+    @Column
+    final LocalDateTime created = LocalDateTime.now();
 }

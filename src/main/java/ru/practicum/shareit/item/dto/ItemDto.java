@@ -1,28 +1,28 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.controller.Create;
+import ru.practicum.shareit.request.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
-@Setter
+@Data
 @Builder
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemDto {
-
     Long id;
-    @NotBlank(message = "Заполните название")
+    @NotBlank(groups = {Create.class})
     String name;
-    @NotBlank(message = "Заполните описание")
+    @NotBlank(groups = {Create.class})
     String description;
-    @NotNull(message = "Не установлен статус")
+    @NotNull(groups = {Create.class})
     Boolean available;
-    User owner;
-    Long request;
+    Long owner;
+    ItemRequest itemRequest;
 }

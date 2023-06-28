@@ -1,15 +1,19 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.controller.Create;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Slf4j
+@Validated
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -17,32 +21,32 @@ public class UserController {
     private final UserService service;
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        log.info("Получение списка пользователей");
-        return service.getAll();
-    }
-
-    @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable Long userId) {
-        log.info("Получение данных пользователя");
-        return service.getUserById(userId);
+    public List<UserDto> getUsers() {
+        return service.getUsers()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
-        log.info("Добавление пользователя");
-        return service.create(userDto);
+    public UserDto createUser(@Validated({Create.class}) @RequestBody UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
+        return UserMapper.toUserDto(service.createUser(user));
     }
 
-    @PatchMapping("/{userId}")
-    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
-        log.info("Изменение данных пользователя");
-        return service.updateUser(userDto, userId);
+    @PatchMapping("/{id}")
+    public UserDto updateUser(@Valid @RequestBody UserDto userDto, @PathVariable("id") Long userId) {
+        User user = UserMapper.toUser(userDto);
+        return UserMapper.toUserDto(service.updateUser(user, userId));
     }
 
-    @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable("userId") Long id) {
-        log.info("Удаление пользователя");
-        service.deleteUserById(id);
+    @GetMapping("/{id}")
+    public UserDto findUserById(@PathVariable("id") Long userId) {
+        return UserMapper.toUserDto(service.findUserById(userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUserById(@PathVariable("id") Long userId) {
+        service.deleteUserById(userId);
     }
 }

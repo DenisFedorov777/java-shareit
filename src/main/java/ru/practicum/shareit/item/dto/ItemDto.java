@@ -2,27 +2,28 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.controller.Create;
-import ru.practicum.shareit.request.ItemRequest;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
-@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemDto {
+
     Long id;
-    @NotBlank(groups = {Create.class})
+    @NotEmpty
+    @Size(min = 1, max = 50)
     String name;
-    @NotBlank(groups = {Create.class})
+    @NotEmpty
+    @Size(min = 1,max = 200)
     String description;
-    @NotNull(groups = {Create.class})
+    @NotNull
     Boolean available;
-    Long owner;
-    ItemRequest itemRequest;
+    Long requestId;
 }

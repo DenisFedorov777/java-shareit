@@ -2,32 +2,36 @@ package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
 @Getter
 @Setter
-@EqualsAndHashCode
-@Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
+@Table(name = "comments")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
     Long id;
-    @Column(name = "text")
-    String text;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     Item item;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    User user;
-    @Column(name = "created")
-    final LocalDateTime created = LocalDateTime.now();
+    User author;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "create_time")
+    LocalDateTime createTime;
+    @NotBlank
+    @Size(max = 2000)
+    String text;
 }

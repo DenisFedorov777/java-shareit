@@ -23,8 +23,8 @@ public class ErrorHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class
-            , BookingNotFoundException.class, ItemRequestNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class,
+            BookingNotFoundException.class, ItemRequestNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleUserNotFound(final RuntimeException e) {
         log.warn("Кажется Вы ошиблись, здесь пусто {}", e.getMessage(), e);
@@ -42,8 +42,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse methodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.warn("Ошибочка вышла {}", e.getMessage(), e);
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
-        return errorResponse;
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler

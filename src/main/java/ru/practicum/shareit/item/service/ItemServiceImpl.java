@@ -120,10 +120,8 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         log.debug("Поиск вещи по тексту: " + text);
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
         Page<Item> itemPage = itemRepository.searchByText(text.toLowerCase(), pageable);
-
         return itemPage.map(ItemMapper::toItemDto).getContent();
     }
 
@@ -132,7 +130,6 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto postComment(Long itemId, Comment comment, Long ownerId) {
         List<Booking> bookings =
                 bookingRepository.findByItemIdAndOwnerId(itemId, ownerId);
-
         if (!bookings.isEmpty()) {
             User user = userRepository.findById(ownerId)
                     .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
@@ -161,9 +158,10 @@ public class ItemServiceImpl implements ItemService {
             comments.addAll(commentRepository.findByTextContainingIgnoreCase(text));
         }
         return comments.stream()
-                .map(comment -> CommentMapper.toCommentDto(comment))
+                .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
     }
+
     private ItemDtoWithBooking putBookings(Item item, Long ownerId) {
         ItemDtoWithBooking itemDto = ItemMapper.toItemDtoWithBooking(item);
         List<Booking> lastBook = bookingRepository

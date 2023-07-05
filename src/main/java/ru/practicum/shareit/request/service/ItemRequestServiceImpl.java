@@ -33,21 +33,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getItemRequests(Long from, Long size, Long requestorId) {
         findUser(requestorId);
         List<ItemRequestDto> itemRequestDtos;
-        if (from != null && size != null) {
-            Pageable pageable = PageRequest.of(
-                    from.intValue(), size.intValue(), Sort.by("created").descending());
-            Page<ItemRequest> page =
-                    itemRequestRepository.findItemRequestsByExcludingRequestorId(requestorId, pageable);
-            itemRequestDtos = page.getContent().stream()
-                    .map(ItemRequestMapper::toItemRequestDto)
-                    .collect(Collectors.toList());
-        } else {
-            List<ItemRequest> requests =
-                    itemRequestRepository.findItemRequestsByExcludingRequestorId(requestorId);
-            itemRequestDtos = requests.stream()
-                    .map(ItemRequestMapper::toItemRequestDto)
-                    .collect(Collectors.toList());
-        }
+        Pageable pageable = PageRequest.of(
+                from.intValue(), size.intValue(), Sort.by("created").descending());
+        Page<ItemRequest> page =
+                itemRequestRepository.findItemRequestsByExcludingRequestorId(requestorId, pageable);
+        itemRequestDtos = page.getContent().stream()
+                .map(ItemRequestMapper::toItemRequestDto)
+                .collect(Collectors.toList());
         log.debug("Получение списка запросов: " + itemRequestDtos);
         return itemRequestDtos;
     }
@@ -55,7 +47,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getItemRequestsByRequestor(Long requestorId) {
         findUser(requestorId);
-        List<ItemRequest> requests = itemRequestRepository.findByRequestorId(requestorId);
+        List<ItemRequest> requests = itemRequestRepository.findAllByRequestorIdOrderByCreatedDesc(requestorId);
         List<ItemRequestDto> itemRequestDtos = requests.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
@@ -83,7 +75,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return ItemRequestMapper.toItemRequestDto(request);
     }
 
-    public User findUser(Long userId) {
+    private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с данным id не найден"));
     }

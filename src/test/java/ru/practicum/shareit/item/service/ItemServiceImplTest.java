@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,19 +67,20 @@ public class ItemServiceImplTest {
     Booking booking1;
     Booking booking2;
     ItemRequest itemRequest1;
+    LocalDateTime time = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
         user1 = new User(1L, "TestUser", "testuser@email.com");
         item1 = new Item(1L, "Item1", "Item1-Desc", true, user1, null);
         item2 = new Item(2L, "Item2", "Item2-Desc", true, user1, null);
-        booking1 = new Booking(1L, user1, LocalDateTime.now().minusDays(2),
-                LocalDateTime.now().minusDays(1), item1, Status.WAITING);
-        booking2 = new Booking(2L, user1, LocalDateTime.now().plusHours(5),
-                LocalDateTime.now().plusHours(10), item1, Status.WAITING);
-        comment1 = new Comment(1L, item1, user1, LocalDateTime.now(), "Comentar");
-        comment2 = new Comment(2L, item1, user1, LocalDateTime.now(), "Comentar2");
-        itemRequest1 = new ItemRequest(1L, "RequestDesc", user1, LocalDateTime.now(), new ArrayList<>());
+        booking1 = new Booking(1L, user1, time.minusDays(2),
+                time.minusDays(1), item1, Status.WAITING);
+        booking2 = new Booking(2L, user1, time.plusHours(5),
+                time.plusHours(10), item1, Status.WAITING);
+        comment1 = new Comment(1L, item1, user1, time, "Comentar");
+        comment2 = new Comment(2L, item1, user1, time, "Comentar2");
+        itemRequest1 = new ItemRequest(1L, "RequestDesc", user1, time, new ArrayList<>());
     }
 
     @Test
@@ -90,8 +92,12 @@ public class ItemServiceImplTest {
         Page<Item> mockedItemPage = new PageImpl<>(mockedItems, pageable, mockedItems.size());
 
         when(itemRepository.findByOwnerId(user1.getId(), pageable)).thenReturn(mockedItemPage);
-        when(bookingRepository.findLastBookingForItem(item1.getId(), user1.getId())).thenReturn(List.of(booking1));
-        when(bookingRepository.findNextBookingForItem(item1.getId(), user1.getId())).thenReturn(List.of(booking2));
+        when(bookingRepository.findAllByItem_IdAndItem_Owner_IdAndStartBeforeAndStatusNotOrderByStartDesc(
+                anyLong(), anyLong(), any(), any()))
+                .thenReturn(List.of(booking1));
+        when(bookingRepository.findAllByItem_IdAndItem_Owner_IdAndStartAfterAndStatusNotOrderByStartAsc(
+                anyLong(), anyLong(), any(), any()))
+                .thenReturn(List.of(booking2));
 
         List<ItemDtoWithBooking> itemDtos = itemService.getItems(user1.getId(), page, size);
 
@@ -105,9 +111,12 @@ public class ItemServiceImplTest {
     @Test
     public void getItemByIdShouldReturnItem() {
         when(itemRepository.findById(item1.getId())).thenReturn(Optional.ofNullable(item1));
-        when(bookingRepository.findLastBookingForItem(item1.getId(), user1.getId())).thenReturn(List.of(booking1));
-        when(bookingRepository.findNextBookingForItem(item1.getId(), user1.getId())).thenReturn(List.of(booking2));
-        when(commentRepository.findByItemId(item1.getId())).thenReturn(List.of(comment1));
+        when(bookingRepository.findAllByItem_IdAndItem_Owner_IdAndStartBeforeAndStatusNotOrderByStartDesc(
+                anyLong(), anyLong(), any(), any()))
+                .thenReturn(List.of(booking1));
+        when(bookingRepository.findAllByItem_IdAndItem_Owner_IdAndStartAfterAndStatusNotOrderByStartAsc(
+                anyLong(), anyLong(), any(), any())).thenReturn(List.of(booking2));
+        when(commentRepository.findAllByItem_Id(item1.getId())).thenReturn(List.of(comment1));
 
         ItemDtoWithBooking resultItem = itemService.getItemById(item1.getId(), user1.getId());
 
@@ -193,7 +202,7 @@ public class ItemServiceImplTest {
 
     @Test
     public void postCommentShouldPost() {
-        when(bookingRepository.findByItemIdAndOwnerId(item1.getId(), user1.getId()))
+        when(bookingRepository.findAllByItem_IdAndBooker_IdAndEndBefore(anyLong(), anyLong(), any(LocalDateTime.class)))
                 .thenReturn((List.of(booking1, booking2)));
         when(itemRepository.findById(any())).thenReturn(Optional.of(item1));
         when(userRepository.findById(any())).thenReturn(Optional.of(user1));
@@ -208,7 +217,7 @@ public class ItemServiceImplTest {
 
     @Test
     public void postCommentShouldThrowDeniedCommentingException() {
-        when(bookingRepository.findByItemIdAndOwnerId(item1.getId(), user1.getId()))
+        when(bookingRepository.findAllByItem_IdAndBooker_IdAndEndBefore(anyLong(), anyLong(), any(LocalDateTime.class)))
                 .thenReturn((Collections.emptyList()));
 
         assertThrows(UserCommentingException.class,
@@ -217,7 +226,7 @@ public class ItemServiceImplTest {
 
     @Test
     public void postCommentShouldThrowUserNotFoundException() {
-        when(bookingRepository.findByItemIdAndOwnerId(item1.getId(), user1.getId()))
+        when(bookingRepository.findAllByItem_IdAndBooker_IdAndEndBefore(anyLong(), anyLong(), any(LocalDateTime.class)))
                 .thenReturn((List.of(booking1, booking2)));
         when(userRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -227,7 +236,7 @@ public class ItemServiceImplTest {
 
     @Test
     public void postCommentShouldThrowItemNotFoundException() {
-        when(bookingRepository.findByItemIdAndOwnerId(item1.getId(), user1.getId()))
+        when(bookingRepository.findAllByItem_IdAndBooker_IdAndEndBefore(anyLong(), anyLong(), any(LocalDateTime.class)))
                 .thenReturn((List.of(booking1, booking2)));
         when(userRepository.findById(any())).thenReturn(Optional.of(user1));
         when(itemRepository.findById(any())).thenReturn(Optional.empty());
@@ -238,8 +247,8 @@ public class ItemServiceImplTest {
 
     @Test
     public void searchCommentsShouldReturnList() {
-        when(commentRepository.findByItemId(item1.getId())).thenReturn(List.of(comment1));
-        when(commentRepository.findByAuthorId(user1.getId())).thenReturn(List.of(comment1, comment2));
+        when(commentRepository.findAllByItem_Id(item1.getId())).thenReturn(List.of(comment1));
+        when(commentRepository.findAllByAuthor_Id(user1.getId())).thenReturn(List.of(comment1, comment2));
         when(commentRepository.findByTextContainingIgnoreCase(any())).thenReturn(List.of(comment1, comment2));
 
         List<CommentDto> commentList = itemService.searchComments(item1.getId(), user1.getId(), "text");
@@ -249,7 +258,7 @@ public class ItemServiceImplTest {
 
     @Test
     public void searchCommentsShouldReturnListWithEmptyItemId() {
-        when(commentRepository.findByAuthorId(user1.getId())).thenReturn(List.of(comment1, comment2));
+        when(commentRepository.findAllByAuthor_Id(user1.getId())).thenReturn(List.of(comment1, comment2));
         when(commentRepository.findByTextContainingIgnoreCase(any())).thenReturn(List.of(comment1, comment2));
 
         List<CommentDto> commentList = itemService.searchComments(null, user1.getId(), "text");
@@ -259,7 +268,7 @@ public class ItemServiceImplTest {
 
     @Test
     public void searchCommentsShouldReturnListWithEmptyuserId() {
-        when(commentRepository.findByItemId(item1.getId())).thenReturn(List.of(comment1));
+        when(commentRepository.findAllByItem_Id(item1.getId())).thenReturn(List.of(comment1));
         when(commentRepository.findByTextContainingIgnoreCase(any())).thenReturn(List.of(comment1, comment2));
 
         List<CommentDto> commentList = itemService.searchComments(item1.getId(), null, "text");
@@ -269,8 +278,8 @@ public class ItemServiceImplTest {
 
     @Test
     public void searchCommentsShouldReturnListWithEmptyText() {
-        when(commentRepository.findByItemId(item1.getId())).thenReturn(List.of(comment1));
-        when(commentRepository.findByAuthorId(user1.getId())).thenReturn(List.of(comment1, comment2));
+        when(commentRepository.findAllByItem_Id(item1.getId())).thenReturn(List.of(comment1));
+        when(commentRepository.findAllByAuthor_Id(user1.getId())).thenReturn(List.of(comment1, comment2));
 
         List<CommentDto> commentList = itemService.searchComments(item1.getId(), user1.getId(), null);
 

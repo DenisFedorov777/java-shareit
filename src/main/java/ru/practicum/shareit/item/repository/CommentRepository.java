@@ -7,12 +7,10 @@ import ru.practicum.shareit.item.model.Comment;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @Query("SELECT c FROM Comment c WHERE c.item.id = ?1")
-    List<Comment> findByItemId(Long itemId);
 
-    @Query("SELECT c FROM Comment c WHERE c.author.id = ?1")
-    List<Comment> findByAuthorId(Long authorId);
+    List<Comment> findAllByItem_Id(Long itemId);
 
-    @Query("SELECT c FROM Comment c WHERE lower(c.text) LIKE %?1%")
+    List<Comment> findAllByAuthor_Id(Long authorId);
+
     List<Comment> findByTextContainingIgnoreCase(String text);
 }

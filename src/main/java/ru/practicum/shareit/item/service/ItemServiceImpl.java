@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.dto.BookingDtoForItem;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.statuses.Status;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserCommentingException;
 import ru.practicum.shareit.exception.UserNotFoundException;
@@ -58,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDtoWithBooking getItemById(Long itemId, Long ownerId) {
         Item item = itemRepository.findById(itemId).get();
         ItemDtoWithBooking result = putBookings(item, ownerId);
-        List<CommentDto> comments = commentRepository.findByItemId(itemId)
+        List<CommentDto> comments = commentRepository.findAllByItem_Id(itemId)
                 .stream()
                 .map(comment -> CommentMapper.toCommentDto(comment))
                 .collect(Collectors.toList());
@@ -129,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto postComment(Long itemId, Comment comment, Long ownerId) {
         List<Booking> bookings =
-                bookingRepository.findByItemIdAndOwnerId(itemId, ownerId);
+                bookingRepository.findAllByItem_IdAndBooker_IdAndEndBefore(itemId, ownerId, LocalDateTime.now());
         if (!bookings.isEmpty()) {
             User user = userRepository.findById(ownerId)
                     .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
@@ -137,7 +138,6 @@ public class ItemServiceImpl implements ItemService {
                     .orElseThrow(() -> new ItemNotFoundException("Вещь не найдена"));
             comment.setAuthor(user);
             comment.setItem(item);
-            comment.setCreateTime(LocalDateTime.now());
             log.debug("Сохранение отзыва о вещи: " + comment);
             return CommentMapper.toCommentDto(commentRepository.save(comment));
         } else {
@@ -149,10 +149,10 @@ public class ItemServiceImpl implements ItemService {
     public List<CommentDto> searchComments(Long itemId, Long authorId, String text) {
         Set<Comment> comments = new HashSet<>();
         if (itemId != null) {
-            comments.addAll(commentRepository.findByItemId(itemId));
+            comments.addAll(commentRepository.findAllByItem_Id(itemId));
         }
         if (authorId != null) {
-            comments.addAll(commentRepository.findByAuthorId(authorId));
+            comments.addAll(commentRepository.findAllByAuthor_Id(authorId));
         }
         if (text != null) {
             comments.addAll(commentRepository.findByTextContainingIgnoreCase(text));
@@ -165,9 +165,11 @@ public class ItemServiceImpl implements ItemService {
     private ItemDtoWithBooking putBookings(Item item, Long ownerId) {
         ItemDtoWithBooking itemDto = ItemMapper.toItemDtoWithBooking(item);
         List<Booking> lastBook = bookingRepository
-                .findLastBookingForItem(item.getId(), ownerId);
+                .findAllByItem_IdAndItem_Owner_IdAndStartBeforeAndStatusNotOrderByStartDesc(
+                        item.getId(), ownerId, LocalDateTime.now(), Status.REJECTED);
         List<Booking> nextBook = bookingRepository
-                .findNextBookingForItem(item.getId(), ownerId);
+                .findAllByItem_IdAndItem_Owner_IdAndStartAfterAndStatusNotOrderByStartAsc(
+                        item.getId(), ownerId, LocalDateTime.now(), Status.REJECTED);
         log.debug("Добавление бронирований к вещи, lastBook: " + lastBook +
                 " и nextBook" + nextBook);
         if (!lastBook.isEmpty()) {

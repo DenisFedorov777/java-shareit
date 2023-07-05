@@ -22,7 +22,7 @@ public class BookingController {
 
     @GetMapping
     public List<BookingResponseDto> getAllBookings(
-            @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId,
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
             @RequestParam(defaultValue = "ALL") String state,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "10") Integer size) {
@@ -30,19 +30,19 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingResponseDto getBooking(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId,
+    public BookingResponseDto getBooking(@RequestHeader("X-Sharer-User-Id") Long ownerId,
                                          @PathVariable Long bookingId) {
         return bookingService.getBooking(ownerId, bookingId);
     }
 
     @PostMapping
     public BookingResponseDto postBooking(@Valid @RequestBody BookingDto bookingDto,
-                                          @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId) {
+                                          @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return bookingService.postBooking(bookingDto, ownerId);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingResponseDto approveBooking(@RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId,
+    public BookingResponseDto approveBooking(@RequestHeader("X-Sharer-User-Id") Long ownerId,
                                              @PathVariable Long bookingId,
                                              @RequestParam Boolean approved) {
         return bookingService.approveBooking(ownerId, bookingId, approved);
@@ -50,7 +50,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getAllOwnerBookings(
-            @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId,
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
             @RequestParam(defaultValue = "ALL") String state,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "10") Integer size) {

@@ -161,29 +161,4 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.authorName").value("Author"))
                 .andExpect(jsonPath("$.created").value(nowTime.format(formatter)));
     }
-
-    @Test
-    public void searchCommentsTest() throws Exception {
-        CommentDto comment1 = new CommentDto(1L, "Author1", LocalDateTime.now(), "Comment1");
-        CommentDto comment2 = new CommentDto(2L, "Author2", LocalDateTime.now(), "Comment2");
-        List<CommentDto> comments = List.of(comment1, comment2);
-
-        when(itemService.searchComments(anyLong(), anyLong(), anyString())).thenReturn(comments);
-
-        mockMvc.perform(get("/items/comments")
-                        .param("itemId", "123")
-                        .param("authorId", "456")
-                        .param("text", "example"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].authorName").value("Author1"))
-                .andExpect(jsonPath("$[0].created").exists())
-                .andExpect(jsonPath("$[0].text").value("Comment1"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].authorName").value("Author2"))
-                .andExpect(jsonPath("$[1].created").exists())
-                .andExpect(jsonPath("$[1].text").value("Comment2"));
-
-        verify(itemService).searchComments(123L, 456L, "example");
-    }
 }

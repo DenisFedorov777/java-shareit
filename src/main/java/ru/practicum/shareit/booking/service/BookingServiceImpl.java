@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.shareit.booking.statuses.Status.*;
@@ -56,22 +57,26 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageRequest.of(adjustedPage, size, Sort.by("id").ascending());
         switch (state) {
             case "ALL":
-                bookingPage = bookingRepository.findAllBookings(ownerId, pageable);
+                bookingPage = bookingRepository.findByBooker_IdOrderByStartDesc(ownerId, pageable);
                 break;
             case "CURRENT":
-                bookingPage = bookingRepository.findCurrentBookings(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+                                ownerId, LocalDateTime.now(), LocalDateTime.now(), pageable);
                 break;
             case "PAST":
-                bookingPage = bookingRepository.findPastBookings(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByBooker_IdAndEndBeforeOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
                 break;
             case "FUTURE":
-                bookingPage = bookingRepository.findFutureBookings(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByBookerIdAndStartAfterOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
                 break;
             case "WAITING":
-                bookingPage = bookingRepository.findBookingsByWaiting(ownerId, pageable);
+                bookingPage = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(ownerId, WAITING, pageable);
                 break;
             case "REJECTED":
-                bookingPage = bookingRepository.findBookingsByRejected(ownerId, pageable);
+                bookingPage = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(ownerId, REJECTED, pageable);
                 break;
             default:
                 throw new UnknownStatusException("Unknown state: " + state);
@@ -90,22 +95,28 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case "ALL":
-                bookingPage = bookingRepository.findOwnerAllBookings(ownerId, pageable);
+                bookingPage = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(ownerId, pageable);
                 break;
             case "CURRENT":
-                bookingPage = bookingRepository.findOwnerCurrentBookings(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByItem_Owner_IdAndStartBeforeAndEndAfterOrderByStartDesc(
+                                ownerId, LocalDateTime.now(), LocalDateTime.now(), pageable);
                 break;
             case "PAST":
-                bookingPage = bookingRepository.findOwnerPastBookings(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
                 break;
             case "FUTURE":
-                bookingPage = bookingRepository.findOwnerFutureBookings(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
                 break;
             case "WAITING":
-                bookingPage = bookingRepository.findOwnerBookingsByWaiting(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, WAITING, pageable);
                 break;
             case "REJECTED":
-                bookingPage = bookingRepository.findOwnerBookingsByRejected(ownerId, pageable);
+                bookingPage = bookingRepository
+                        .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, REJECTED, pageable);
                 break;
             default:
                 throw new UnknownStatusException("Unknown state: " + state);

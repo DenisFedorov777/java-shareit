@@ -20,7 +20,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoWithBooking> getItems(
-            @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId,
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
             @Positive @RequestParam(defaultValue = "0") int page,
             @Positive @RequestParam(defaultValue = "10") int size) {
         return itemService.getItems(ownerId, page, size);
@@ -29,20 +29,20 @@ public class ItemController {
     @GetMapping("/{id}")
     public ItemDtoWithBooking getItemById(
             @PathVariable Long id,
-            @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId) {
+            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.getItemById(id, ownerId);
     }
 
     @PostMapping
     public ItemDto postItem(@Valid @RequestBody ItemDto itemDto,
-                            @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId) {
+                            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.postItem(itemDto, ownerId);
     }
 
     @PatchMapping("/{id}")
     public ItemDto updateItem(@RequestBody ItemDto itemDto,
                               @PathVariable Long id,
-                              @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId) {
+                              @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         itemDto.setId(id);
         return itemService.updateItem(itemDto, ownerId);
     }
@@ -54,7 +54,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(
-            @RequestParam(required = true) String text,
+            @RequestParam String text,
             @Positive @RequestParam(defaultValue = "0") int page,
             @Positive @RequestParam(defaultValue = "10") int size) {
         return itemService.searchItems(text, page, size);
@@ -63,15 +63,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto postComment(@PathVariable Long itemId,
                                   @Valid @RequestBody Comment comment,
-                                  @RequestHeader(value = "X-Sharer-User-Id", required = true) Long ownerId) {
+                                  @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.postComment(itemId, comment, ownerId);
-    }
-
-    @GetMapping("/comments")
-    public List<CommentDto> searchComments(
-            @RequestParam(required = false) Long itemId,
-            @RequestParam(required = false) Long authorId,
-            @RequestParam(required = false) String text) {
-        return itemService.searchComments(itemId, authorId, text);
     }
 }

@@ -65,7 +65,7 @@ public class ItemRequestRepositoryTest {
         itemRequest2.setDescription("Описание2");
         itemRequestRepository.save(itemRequest2);
 
-        List<ItemRequest> result = itemRequestRepository.findByRequestorId(requestorId);
+        List<ItemRequest> result = itemRequestRepository.findAllByRequestorIdOrderByCreatedDesc(requestorId);
 
         assertThat(result).isNotEmpty();
         assertThat(result.size()).isEqualTo(2);

@@ -55,6 +55,7 @@ public class BookingServiceImplTest {
     Booking booking1;
     Booking booking2;
     ItemRequest itemRequest1;
+    LocalDateTime time = LocalDateTime.now();
 
     @BeforeEach
     public void setUp() {
@@ -112,7 +113,7 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findAllBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findByBooker_IdOrderByStartDesc(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllBookings(user1.getId(), "ALL", 0, 10);
@@ -133,8 +134,12 @@ public class BookingServiceImplTest {
         List<Booking> mockedBookings = List.of(booking1, booking2);
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findCurrentBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(user1));
+        when(bookingRepository
+                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+                        any(), any(), any(), any()))
+                .thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllBookings(user1.getId(), "CURRENT", 0, 10);
@@ -156,7 +161,9 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findPastBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository
+                .findAllByBooker_IdAndEndBeforeOrderByStartDesc(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
+                .thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllBookings(user1.getId(), "PAST", 0, 10);
@@ -178,7 +185,9 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findFutureBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository
+                .findAllByBookerIdAndStartAfterOrderByStartDesc(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
+                .thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllBookings(user1.getId(), "FUTURE", 0, 10);
@@ -200,7 +209,9 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findBookingsByWaiting(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository
+                .findAllByBookerIdAndStatusOrderByStartDesc(anyLong(),any(Status.class), any(Pageable.class)))
+                .thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllBookings(user1.getId(), "WAITING", 0, 10);
@@ -222,7 +233,9 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findBookingsByRejected(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository
+                .findAllByBookerIdAndStatusOrderByStartDesc(anyLong(), any(Status.class), any(Pageable.class)))
+                .thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllBookings(user1.getId(), "REJECTED", 0, 10);
@@ -252,7 +265,7 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findOwnerAllBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllOwnerBookings(user1.getId(), "ALL", 0, 10);
@@ -274,7 +287,7 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findOwnerCurrentBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfterOrderByStartDesc(anyLong(), any(), any(), any())).thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllOwnerBookings(user1.getId(), "CURRENT", 0, 10);
@@ -296,7 +309,7 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findOwnerPastBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(anyLong(), any(), any())).thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllOwnerBookings(user1.getId(), "PAST", 0, 10);
@@ -318,7 +331,8 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findOwnerFutureBookings(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
+                anyLong(), any(), any())).thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllOwnerBookings(user1.getId(), "FUTURE", 0, 10);
@@ -340,7 +354,8 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findOwnerBookingsByWaiting(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(
+                anyLong(), any(), any())).thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllOwnerBookings(user1.getId(), "WAITING", 0, 10);
@@ -362,7 +377,8 @@ public class BookingServiceImplTest {
         Page<Booking> mockedBookingsPage = new PageImpl<>(mockedBookings, pageable, mockedBookings.size());
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user1));
-        when(bookingRepository.findOwnerBookingsByRejected(user1.getId(), pageable)).thenReturn(mockedBookingsPage);
+        when(bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(anyLong(), any(), any()))
+                .thenReturn(mockedBookingsPage);
 
         List<BookingResponseDto> resultBookList =
                 bookingService.getAllOwnerBookings(user1.getId(), "REJECTED", 0, 10);

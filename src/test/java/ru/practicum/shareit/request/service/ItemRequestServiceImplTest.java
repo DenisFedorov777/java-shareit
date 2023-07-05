@@ -101,26 +101,11 @@ public class ItemRequestServiceImplTest {
     }
 
     @Test
-    public void getItemRequestsShouldReturnListWithNullFromAndSize() {
-        List<ItemRequest> mockedRequests = List.of(itemRequest1, itemRequest2);
-
-        when(userRepository.findById(user1.getId())).thenReturn(Optional.ofNullable(user1));
-        when(itemRequestRepository
-                .findItemRequestsByExcludingRequestorId(user1.getId())).thenReturn(mockedRequests);
-
-        List<ItemRequestDto> resultList = itemRequestService.getItemRequests(null, null, user1.getId());
-
-        assertEquals(mockedRequests.size(), resultList.size());
-        assertEquals(mockedRequests.get(0).getId(), resultList.get(0).getId());
-        assertEquals(mockedRequests.get(1).getId(), resultList.get(1).getId());
-    }
-
-    @Test
     public void getItemRequestsByRequestorTest() {
         List<ItemRequest> mockedRequests = List.of(itemRequest1, itemRequest2);
 
         when(userRepository.findById(user1.getId())).thenReturn(Optional.ofNullable(user1));
-        when(itemRequestRepository.findByRequestorId(anyLong())).thenReturn(mockedRequests);
+        when(itemRequestRepository.findAllByRequestorIdOrderByCreatedDesc(anyLong())).thenReturn(mockedRequests);
 
         List<ItemRequestDto> resultList = itemRequestService.getItemRequestsByRequestor(user1.getId());
 

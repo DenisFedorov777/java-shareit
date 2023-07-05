@@ -36,6 +36,8 @@ public class BookingRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
+    LocalDateTime time = LocalDateTime.now();
+
     User owner;
     Item item;
 
@@ -68,7 +70,7 @@ public class BookingRepositoryTest {
         entityManager.persist(booking);
         entityManager.flush();
 
-        List<Booking> result = bookingRepository.findByItemIdAndOwnerId(itemId, ownerId);
+        List<Booking> result = bookingRepository.findAllByItem_IdAndBooker_IdAndEndBefore(itemId, ownerId, time);
 
         assertThat(result).isNotEmpty();
         assertThat(result).contains(booking);
@@ -96,7 +98,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findAllBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findByBooker_IdOrderByStartDesc(ownerId, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(booking, booking2);
@@ -131,7 +133,9 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findCurrentBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository
+                .findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
+                        ownerId, time, time, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(currentBooking);
@@ -174,7 +178,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findPastBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findAllByBooker_IdAndEndBeforeOrderByStartDesc(ownerId, time, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(pastBooking1, pastBooking2);
@@ -216,7 +220,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findFutureBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(ownerId, time, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(futureBooking1, futureBooking2);
@@ -254,7 +258,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findBookingsByWaiting(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(waitingBooking1, waitingBooking2);
@@ -292,7 +296,8 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findBookingsByRejected(1L, pageable);
+        Page<Booking> result = bookingRepository
+                .findAllByBookerIdAndStatusOrderByStartDesc(1L, Status.REJECTED, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(waitingBooking1, waitingBooking2);
@@ -321,7 +326,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findOwnerAllBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(ownerId, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(booking, booking2);
@@ -356,7 +361,8 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findOwnerCurrentBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository
+                .findAllByItem_Owner_IdAndStartBeforeAndEndAfterOrderByStartDesc(ownerId, time, time, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(currentBooking);
@@ -399,7 +405,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findOwnerPastBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(ownerId, time, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(pastBooking1, pastBooking2);
@@ -441,7 +447,7 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findOwnerFutureBookings(ownerId, pageable);
+        Page<Booking> result = bookingRepository.findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, time, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(futureBooking1, futureBooking2);
@@ -479,7 +485,8 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findOwnerBookingsByRejected(ownerId, pageable);
+        Page<Booking> result = bookingRepository
+                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, Status.REJECTED, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(waitingBooking1, waitingBooking2);
@@ -518,7 +525,8 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        Page<Booking> result = bookingRepository.findOwnerBookingsByWaiting(ownerId, pageable);
+        Page<Booking> result = bookingRepository
+                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, Status.WAITING, pageable);
 
         assertThat(result).isNotEmpty();
         assertThat(result.getContent()).contains(waitingBooking1, waitingBooking2);
@@ -549,7 +557,8 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        List<Booking> result = bookingRepository.findLastBookingForItem(itemId, ownerId);
+        List<Booking> result = bookingRepository.findAllByItem_IdAndItem_Owner_IdAndStartBeforeAndStatusNotOrderByStartDesc(
+                itemId, ownerId, time, Status.REJECTED);
 
         assertThat(result).isNotEmpty();
         assertThat(result).contains(booking2);
@@ -579,7 +588,9 @@ public class BookingRepositoryTest {
 
         entityManager.flush();
 
-        List<Booking> result = bookingRepository.findNextBookingForItem(itemId, ownerId);
+        List<Booking> result = bookingRepository
+                .findAllByItem_IdAndItem_Owner_IdAndStartAfterAndStatusNotOrderByStartAsc(
+                        itemId, ownerId, time, Status.REJECTED);
 
         assertThat(result).isNotEmpty();
         assertThat(result).contains(booking1);

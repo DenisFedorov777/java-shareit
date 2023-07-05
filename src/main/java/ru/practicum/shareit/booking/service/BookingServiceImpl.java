@@ -179,7 +179,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingResponseDto(bookingRepository.save(booking));
     }
 
-    public User findUser(Long ownerId) {
+    private User findUser(Long ownerId) {
         return userRepository.findById(ownerId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
     }

@@ -20,7 +20,7 @@ public class ItemRequestMapper {
         itemRequest.setId(itemRequestDto.getId());
         itemRequest.setDescription(itemRequestDto.getDescription());
         itemRequest.setRequestor(itemRequestDto.getRequestor());
-        itemRequest.setCreated(itemRequestDto.getCreated());
+        itemRequest.setCreated(LocalDateTime.now());
 
         return itemRequest;
     }
@@ -30,7 +30,7 @@ public class ItemRequestMapper {
         itemRequestDto.setId(itemRequest.getId());
         itemRequestDto.setDescription(itemRequest.getDescription());
         itemRequestDto.setRequestor(itemRequest.getRequestor());
-        itemRequestDto.setCreated(LocalDateTime.now());
+        itemRequestDto.setCreated(itemRequest.getCreated());
 
         List<Item> requestedItems = itemRequest.getItems();
         List<ItemDto> requestedItemsDto = null;

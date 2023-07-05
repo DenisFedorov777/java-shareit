@@ -60,7 +60,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto postItemRequest(ItemRequestDto itemRequestDto, Long requestorId) {
         User user = findUser(requestorId);
         itemRequestDto.setRequestor(user);
-        itemRequestDto.setCreated(LocalDateTime.now());
         log.debug("Создание запроса на вещь: " + itemRequestDto);
         ItemRequest itemRequest = itemRequestRepository.save(ItemRequestMapper.toItemRequest(itemRequestDto));
         return ItemRequestMapper.toItemRequestDto(itemRequest);

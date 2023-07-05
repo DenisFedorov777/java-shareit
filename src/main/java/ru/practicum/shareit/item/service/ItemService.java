@@ -5,7 +5,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.model.Comment;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemService {

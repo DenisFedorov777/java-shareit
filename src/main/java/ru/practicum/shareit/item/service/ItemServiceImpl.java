@@ -138,6 +138,7 @@ public class ItemServiceImpl implements ItemService {
                     .orElseThrow(() -> new ItemNotFoundException("Вещь не найдена"));
             comment.setAuthor(user);
             comment.setItem(item);
+            comment.setCreateTime(LocalDateTime.now());
             log.debug("Сохранение отзыва о вещи: " + comment);
             return CommentMapper.toCommentDto(commentRepository.save(comment));
         } else {

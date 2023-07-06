@@ -1,51 +1,89 @@
 package ru.practicum.shareit.handler;
 
-import org.postgresql.util.PSQLException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.shareit.exception.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+import java.util.NoSuchElementException;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler({InvalidDataException.class, ConstraintViolationException.class})
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleInvalidDataException(final RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
+    public String handleIllegalArgumentException(final IllegalArgumentException e) {
+        log.warn("Кажется Вы ошиблись, здесь пусто {}", e.getMessage(), e);
+        return e.getMessage();
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalArgumentException(final RuntimeException e) {
-        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS");
-    }
-
-    @ExceptionHandler({ItemAlreadyExistException.class, ExistEmailException.class, UserAlreadyExistException.class, PSQLException.class})
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleFilmAlreadyExistException(final RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class, BookingNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class,
+            BookingNotFoundException.class, ItemRequestNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleFilmNotFoundException(final RuntimeException e) {
+    public String handleUserNotFound(final RuntimeException e) {
+        log.warn("Кажется Вы ошиблись, здесь пусто {}", e.getMessage(), e);
+        return e.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String unauthorizedAccessException(final UserBookingException e) {
+        log.warn("Кажется Вы ошиблись, здесь пусто {}", e.getMessage(), e);
+        return e.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse methodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        log.warn("Ошибочка вышла {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMethodValidException(final MethodArgumentNotValidException e) {
-        return new ErrorResponse("Error validation Data");
+    public String validationConstraintException(final ConstraintViolationException e) {
+        log.warn("Ошибочка вышла {}", e.getMessage(), e);
+        return e.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String validationNoSuchElementException(final NoSuchElementException e) {
+        log.warn("Кажется Вы ошиблись, здесь пусто {}", e.getMessage(), e);
+        return e.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String entityNotFoundExceptionException(final EntityNotFoundException e) {
+        log.warn("Кажется Вы ошиблись, здесь пусто {}", e.getMessage(), e);
+        return e.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnsupportedStatusException(UnknownStatusException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+        return errorResponse;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String deniedCommentingException(final UserCommentingException e) {
+        log.warn("Ошибочка вышла {}", e.getMessage(), e);
+        return e.getMessage();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(final Throwable e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка.");
+    public String unHandledException(final Exception e) {
+        log.warn("Сервер полетел {}", e.getMessage(), e);
+        return e.getMessage();
     }
 }

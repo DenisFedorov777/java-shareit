@@ -1,54 +1,59 @@
 package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
-import ru.practicum.shareit.booking.model.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.model.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.booking.statuses.BookingState;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Validated
 @RestController
-@RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
+@RequestMapping(path = "/bookings")
 public class BookingController {
-    private final BookingService service;
 
-    @PostMapping
-    public BookingDtoResponse createBookingRequest(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Valid @RequestBody BookingDto bookingDto) {
-        return (service.createBookingRequest(bookingDto, userId));
-    }
+    private final BookingService bookingService;
 
-    @PatchMapping("/{bookingId}")
-    public BookingDtoResponse updateBookingStatusByOwner(
-            @PathVariable("bookingId") Long bookingId,
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam boolean approved) {
-        return service.updateBookingStatusByOwner(bookingId, userId, approved);
+    @GetMapping
+    public List<BookingResponseDto> getAllBookings(
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getAllBookings(ownerId, state, from, size);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDtoResponse getBookingDetails(
-            @PathVariable("bookingId") Long bookingId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.getBookingDetails(bookingId, userId);
+    public BookingResponseDto getBooking(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+                                         @PathVariable Long bookingId) {
+        return bookingService.getBooking(ownerId, bookingId);
     }
 
-    @GetMapping
-    public List<BookingDtoResponse> getAllBookingsByAuthor(
-            @RequestParam(required = false, defaultValue = "ALL") BookingState state,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.getAllBookingsByAuthor(state, userId);
+    @PostMapping
+    public BookingResponseDto postBooking(@Valid @RequestBody BookingDto bookingDto,
+                                          @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        return bookingService.postBooking(bookingDto, ownerId);
+    }
+
+    @PatchMapping("/{bookingId}")
+    public BookingResponseDto approveBooking(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+                                             @PathVariable Long bookingId,
+                                             @RequestParam Boolean approved) {
+        return bookingService.approveBooking(ownerId, bookingId, approved);
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoResponse> getAllBookingByOwner(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(required = false, defaultValue = "ALL") BookingState state) {
-        return service.getAllBookingByOwner(state, userId);
+    public List<BookingResponseDto> getAllOwnerBookings(
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getAllOwnerBookings(ownerId, state, from, size);
     }
 }

@@ -1,24 +1,22 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.controller.Create;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Data
-@Builder
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class UserDto {
-    Long id;
-    @NotBlank(groups = Create.class)
-    String name;
-    @NotBlank(groups = Create.class)
-    @Email(groups = Create.class)
-    String email;
+    private Long id;
+    private String name;
+    @Email(groups = {UserDto.OnCreate.class}, message = "must be a well-formed email address")
+    @NotBlank(groups = {UserDto.OnCreate.class}, message = "must not be blank")
+    private String email;
+
+    public interface OnCreate {
+    }
 }

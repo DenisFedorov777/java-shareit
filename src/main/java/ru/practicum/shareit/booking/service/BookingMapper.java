@@ -4,56 +4,44 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
-import ru.practicum.shareit.booking.model.dto.BookingDtoResponse;
-import ru.practicum.shareit.booking.model.dto.BookingOwnerDto;
-import ru.practicum.shareit.booking.statuses.BookingStatus;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.booking.model.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.dto.BookingShortDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingMapper {
 
-    public static Booking toBooking(BookingDto bookingDto, Item item, User booker) {
-
-        return Booking.builder()
-                .startDate(bookingDto.getStart())
-                .endDate(bookingDto.getEnd())
-                .item(item)
-                .booker(booker)
-                .status(BookingStatus.WAITING)
-                .build();
+    public static BookingDto toBookingDto(Booking booking) {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setId(booking.getId());
+        bookingDto.setStart(booking.getStart());
+        bookingDto.setEnd(booking.getEnd());
+        return bookingDto;
     }
 
-    public static BookingDtoResponse toBookingDtoResponse(Booking booking, ItemDto itemDto) {
-        return BookingDtoResponse.builder()
-                .id(booking.getId())
-                .item(itemDto)
-                .start(booking.getStartDate())
-                .end(booking.getEndDate())
-                .status(booking.getStatus())
-                .booker(UserMapper.toBookerDto(booking.getBooker()))
-                .build();
+    public static Booking toBooking(BookingDto bookingDto) {
+        Booking booking = new Booking();
+        booking.setStart(bookingDto.getStart());
+        booking.setEnd(bookingDto.getEnd());
+        return booking;
     }
 
-    public static BookingDtoResponse toUpdateBookingDtoResponse(Booking booking, ItemDto itemDto) {
-        return BookingDtoResponse.builder()
-                .id(booking.getId())
-                .item(itemDto)
-                .start(booking.getStartDate())
-                .end(booking.getEndDate())
-                .status(booking.getStatus())
-                .booker(UserMapper.toBookerDto(booking.getBooker()))
-                .build();
+    public static BookingResponseDto toBookingResponseDto(Booking booking) {
+        BookingResponseDto bookingResponseDto = new BookingResponseDto();
+        bookingResponseDto.setId(booking.getId());
+        bookingResponseDto.setStart(booking.getStart());
+        bookingResponseDto.setEnd(booking.getEnd());
+        bookingResponseDto.setItem(booking.getItem());
+        bookingResponseDto.setBooker(booking.getBooker());
+        bookingResponseDto.setStatus(booking.getStatus());
+        return bookingResponseDto;
     }
 
-    public static BookingOwnerDto toBookingOwnerDto(Booking booking) {
-        return BookingOwnerDto.builder()
-                .id(booking.getId())
-                .start(booking.getStartDate())
-                .end(booking.getEndDate())
-                .bookerId(booking.getBooker().getId())
-                .build();
+    public static BookingShortDto toBookingShortDto(Booking booking) {
+        BookingShortDto bookingShortDto = new BookingShortDto();
+        bookingShortDto.setId(booking.getId());
+        bookingShortDto.setItem(booking.getItem());
+        bookingShortDto.setBooker(booking.getBooker());
+        bookingShortDto.setStatus(booking.getStatus());
+        return bookingShortDto;
     }
 }

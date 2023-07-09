@@ -18,8 +18,10 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getItems(
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        return itemClient.getItems(ownerId);
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @Positive @RequestParam(defaultValue = "0") int from,
+            @Positive @RequestParam(defaultValue = "10") int size) {
+        return itemClient.getItems(ownerId, from, size);
     }
 
     @GetMapping("/{id}")
@@ -38,8 +40,8 @@ public class ItemController {
     @PatchMapping("/{id}")
     public ResponseEntity<Object> updateItem(@RequestBody ItemDto itemDto,
                                              @PathVariable Long id,
-                                             @RequestHeader(value = "X-Sharer-User-Id") Long ownerId) {
-        return itemClient.updateItem(itemDto, ownerId, id);
+                                             @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        return itemClient.updateItem(itemDto, id, ownerId);
     }
 
     @DeleteMapping("/{id}")
@@ -48,8 +50,12 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchItems(@RequestParam String text) {
-        return itemClient.searchItems(text);
+    public ResponseEntity<Object> searchItems(
+            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @RequestParam String text,
+            @Positive @RequestParam(defaultValue = "0") int from,
+            @Positive @RequestParam(defaultValue = "10") int size) {
+        return itemClient.searchItems(ownerId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

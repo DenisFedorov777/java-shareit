@@ -16,7 +16,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
-
+    Long id;
+    Item item;
+    User author;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    LocalDateTime createTime;
     @NotBlank
     @Size(max = 2000)
     String text;

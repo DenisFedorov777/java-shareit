@@ -91,7 +91,7 @@ public class ItemServiceImplTest {
         List<Item> mockedItems = List.of(item1, item2);
         Page<Item> mockedItemPage = new PageImpl<>(mockedItems, pageable, mockedItems.size());
 
-        when(itemRepository.findByOwnerId(user1.getId(), pageable)).thenReturn(mockedItemPage);
+        when(itemRepository.findByOwnerIdOrderByIdAsc(user1.getId(), pageable)).thenReturn(mockedItemPage);
         when(bookingRepository.findAllByItem_IdAndItem_Owner_IdAndStartBeforeAndStatusNotOrderByStartDesc(
                 anyLong(), anyLong(), any(), any()))
                 .thenReturn(List.of(booking1));

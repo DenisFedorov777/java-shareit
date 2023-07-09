@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.dto.BookingDto;
 import ru.practicum.shareit.booking.model.dto.BookingResponseDto;
-import ru.practicum.shareit.booking.model.dto.BookingShortDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingMapper {
@@ -34,14 +33,5 @@ public class BookingMapper {
         bookingResponseDto.setBooker(booking.getBooker());
         bookingResponseDto.setStatus(booking.getStatus());
         return bookingResponseDto;
-    }
-
-    public static BookingShortDto toBookingShortDto(Booking booking) {
-        BookingShortDto bookingShortDto = new BookingShortDto();
-        bookingShortDto.setId(booking.getId());
-        bookingShortDto.setItem(booking.getItem());
-        bookingShortDto.setBooker(booking.getBooker());
-        bookingShortDto.setStatus(booking.getStatus());
-        return bookingShortDto;
     }
 }

@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.model.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Page<Item> findByOwnerId(Long ownerId, Pageable pageable);
+    Page<Item> findByOwnerIdOrderByIdAsc(Long ownerId, Pageable pageable);
 
     @Query("SELECT i FROM Item i " +
             "WHERE (LOWER(i.name) LIKE CONCAT('%', LOWER(:text), '%') " +

@@ -17,7 +17,7 @@ public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
-    public ItemRequestDto postItemRequest(@Valid @RequestBody ItemRequestDto itemRequestDto,
+    public ItemRequestDto postItemRequest(@RequestBody ItemRequestDto itemRequestDto,
                                           @RequestHeader("X-Sharer-User-Id") Long requestorId) {
         return itemRequestService.postItemRequest(itemRequestDto, requestorId);
     }
@@ -35,8 +35,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDto> getItemRequests(@PositiveOrZero @RequestParam(defaultValue = "0") Long from,
-                                                @Positive @RequestParam(defaultValue = "10") Long size,
+    public List<ItemRequestDto> getItemRequests(@RequestParam(defaultValue = "0") Long from,
+                                                @RequestParam(defaultValue = "10") Long size,
                                                 @RequestHeader("X-Sharer-User-Id") Long requestorId) {
         return itemRequestService.getItemRequests(from, size, requestorId);
     }

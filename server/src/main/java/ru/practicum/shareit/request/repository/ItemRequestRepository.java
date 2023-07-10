@@ -11,11 +11,6 @@ import java.util.List;
 
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
 
-    /*@Query("SELECT ir " +
-            "FROM ItemRequest ir " +
-            "WHERE ir.requestor.id = ?1 " +
-            "ORDER BY ir.created DESC")
-    List<ItemRequest> findByRequestorId(Long requestorId);*/
     List<ItemRequest> findAllByRequestorIdOrderByCreatedDesc(Long requestorId);
 
     @Query("SELECT ir " +

@@ -177,11 +177,16 @@ public class ItemServiceImpl implements ItemService {
             BookingDtoForItem lastBooking = new BookingDtoForItem(
                     lastBook.get(0).getId(), lastBook.get(0).getBooker().getId());
             itemDto.setLastBooking(lastBooking);
+        } else {
+            itemDto.setLastBooking(null);
         }
         if (!nextBook.isEmpty()) {
             BookingDtoForItem nextBooking = new BookingDtoForItem(
                     nextBook.get(0).getId(), nextBook.get(0).getBooker().getId());
             itemDto.setNextBooking(nextBooking);
+        } else {
+            itemDto.setNextBooking(null);
+
         }
         return itemDto;
     }

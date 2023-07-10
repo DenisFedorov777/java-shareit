@@ -10,6 +10,7 @@ services:
       - server
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
+      - TZ=Europa/Samara
 
   server:
     build: server
@@ -24,6 +25,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=denis1
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - TZ=Europa/Samara
 
   db:
     image: postgres:13.7-alpine
@@ -34,3 +36,4 @@ services:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=denis1
+      - TZ=Europa/Samara

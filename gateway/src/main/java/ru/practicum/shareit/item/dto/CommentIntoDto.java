@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Comment {
+public class CommentIntoDto {
+
     Long id;
-    Item item;
-    User author;
+    Long itemId;
+    String authorName;
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime createTime;
     @NotBlank

@@ -21,8 +21,8 @@ public class ItemController {
     @GetMapping
     public List<ItemDtoWithBooking> getItems(
             @RequestHeader("X-Sharer-User-Id") Long ownerId,
-            @Positive @RequestParam(defaultValue = "0") int page,
-            @Positive @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return itemService.getItems(ownerId, page, size);
     }
 
@@ -34,7 +34,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto postItem(@Valid @RequestBody ItemDto itemDto,
+    public ItemDto postItem(@RequestBody ItemDto itemDto,
                             @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.postItem(itemDto, ownerId);
     }
@@ -55,14 +55,14 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItems(
             @RequestParam String text,
-            @Positive @RequestParam(defaultValue = "0") int page,
-            @Positive @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return itemService.searchItems(text, page, size);
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentDto postComment(@PathVariable Long itemId,
-                                  @Valid @RequestBody Comment comment,
+                                  @RequestBody Comment comment,
                                   @RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.postComment(itemId, comment, ownerId);
     }
